@@ -15,13 +15,58 @@ function showGalleryImage(works) {
         gallery.appendChild(figureElement);
     } 
 }
+
+/** Mettre les images de la galerie de manière dynamique dans la modal **/
+
+function showGalleryModalImage(works) {
+    for(let work of works){ // work = 1 seul objet, works = l'ensemble des objets
+        const gallery = document.querySelector(".modal-gallery")
+        const figureElement = document.createElement("figure");
+        figureElement.style.position = "relative" //faut faire une classe
+        const imageElement = document.createElement("img");
+        const figcaptionElement = document.createElement("figcaption");
+        // faire un dataset afin de stocker l'id de chaque travaux 
+        figureElement.dataset.workId = work.id;
+
+        // Créer un élément icône de corbeille pour supprimer les images
+        const trashIcon = document.createElement("i")
+        trashIcon.classList.add("fa-solid", "fa-trash-can", "trash")
+        trashIcon.addEventListener("click", function(event){
+            // fetch / function qui delete
+            
+            // tu récupere l'ID du travail que tu veux supprimer
+            // tu le passe en parametre a fetch ou a ta fonction qui delete.
+            console.log("delete");
+        })
+        imageElement.src = work.imageUrl;
+        imageElement.alt = work.title;
+        figcaptionElement.innerText = "editer";
+        figureElement.appendChild(imageElement);
+        figureElement.appendChild(figcaptionElement);
+        figureElement.appendChild(trashIcon)
+    
+
+        gallery.appendChild(figureElement);
+    } 
+}
+
 // Montrer les filtres
 function showFilters(works){
     const filtersList = [...new Set(works.map(work => work.category.name))];
     const filtersContainer = document.getElementById("filters");
+
+    const allFilter = document.createElement("button")
+    allFilter.textContent = "Tous"
+    allFilter.addEventListener("click", () => filterGalleryByCategory("all", works));
+    //allFilter.classList.add("btnFilter")
+    allFilter.className = "btnFilter"
+    filtersContainer.appendChild(allFilter)
+    
     filtersList.forEach(category => {
         const filterButton = document.createElement("button");
         filterButton.textContent = category;
+        //filterButton.classList.add("btnFilter")
+        filterButton.className = "btnFilter"
         filterButton.addEventListener("click", () => filterGalleryByCategory(category, works));
         filtersContainer.appendChild(filterButton);
     });
@@ -29,19 +74,26 @@ function showFilters(works){
 
 // Afficher les filtres par catégorie
 function filterGalleryByCategory(category, works) {
-    const filteredWorks = works.filter(work => work.category.name === category);
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
-    
-    showGalleryImage(filteredWorks);
+    if(category === "all"){
+        const filteredWorks = works;
+        const gallery = document.getElementById("gallery");
+        gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
+        showGalleryImage(filteredWorks);
+    } else {
+        const filteredWorks = works.filter(work => work.category.name === category);
+        const gallery = document.getElementById("gallery");
+        gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
+        showGalleryImage(filteredWorks);
+    }
 }
 
-// fonction achronyme de works
+// fonction anonyme de works
 async function getWorks(){
     const works = await fetch("http://localhost:5678/api/works") //récupération des éléménts(API et JSON)
     const result = await works.json()
     console.log(result)
     showGalleryImage(result)
+    showGalleryModalImage(result)
     showFilters(result)
   // Si mon utilisateur n'est pas connecté
 }
@@ -60,7 +112,7 @@ const formPhoto = document.getElementById("form-photo");
 
 // Ouvre la première modal
 openModalButton.addEventListener("click", () => {
-    modal1.style.display = "block";
+    modal1.style.display = "flex";
 });
 
 // Fermer toutes les modales
@@ -78,7 +130,7 @@ deleteGalleryParagraph.addEventListener("click", () => {
 });
 // Ouvre la deuxième modal (ajout de photo)
 addPhotoButton.addEventListener("click", () => {
-    modal2.style.display = "block";
+    modal2.style.display = "flex";
 });
 
 // Gére l'envoi du formulaire d'ajout de photo
@@ -101,7 +153,7 @@ formPhoto.addEventListener("submit", async (e) => {
     formData.append("category", category);
 
     try {
-        const response = await fetch("http://localhost:5678/api/users/login", {
+        const response = await fetch("http://localhost:5678/api/works", {
             method: "POST",
             body: formData,
             headers: {
@@ -111,7 +163,7 @@ formPhoto.addEventListener("submit", async (e) => {
 
         if (response.ok) {
             alert("La photo a été ajoutée avec succès !");
-            modal2.style.display = "none"; // Fermer la modal après l'ajout
+            modal2.style.display = "none"; // Ferme la modal après l'ajout
             resetForm(); // Réinitialise le formulaire pour la prochaine utilisation
             getWorks(); // Rafraîchis la galerie pour afficher la nouvelle photo
         } else {
@@ -122,12 +174,6 @@ formPhoto.addEventListener("submit", async (e) => {
         console.error("Une erreur s'est produite lors de l'ajout de la photo :", error);
     }
 });
-
-
-
-
-
-
 
     modal2.style.display = "none";
 });
@@ -168,9 +214,3 @@ formPhoto.addEventListener("submit", async (e) => {
         console.error("Une erreur s'est produite lors de l'ajout de la photo :", error);
     }
 });
-
-
-
-
-
-

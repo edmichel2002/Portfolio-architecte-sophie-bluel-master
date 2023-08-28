@@ -20,6 +20,7 @@
 		<button class="buttonEdition"><i class="fa-regular fa-pen-to-square"></i> Mode édition</button>
 		<button class="btn">publier les changements</button>
 	</nav>
+	<main>
 <header>
 	<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
 	<nav>
@@ -27,11 +28,13 @@
 			<li><a href="#portfolio">projets</li></a>
 			<li><a href="#contact">contact</li></a>
 			<li><a href="../FrontEnd/login.html">login</li></a>
+			<li>
+				<a href="./index.html" id="logout" class="invisible">logout</a>
+			</li>
 			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 		</ul>
 	</nav>
 </header>
-<main>
 	<section id="introduction">
 		<figure>
 			<img src="./assets/images/sophie-bluel.png" alt="">
@@ -70,7 +73,7 @@
 					<div class="modal-gallery"></div>
 					<hr/>
 					<button class="green js-modal2">Ajouter une photo</button>
-					<p>Supprimer la galerie</p>
+					<p>Supprimer la gallerie</p>
 				</div>
 			</div>
 		</article>
@@ -95,6 +98,7 @@
 						<label for="importPhoto" id="labelPhoto">+ Ajouter photo</label>
 						<p>jpg, png : 4mo max</p>
 					</div>
+
 					<input type="file" class="blue" id="importPhoto" accept="image/jpg, image/png" name="image" hidden>
 					<label for="titre">Titre</label>
 					<input type="text" name="titre" id="titre"/>
