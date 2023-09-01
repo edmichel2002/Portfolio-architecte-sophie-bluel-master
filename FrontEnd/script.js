@@ -1,4 +1,4 @@
-/** Mettre les images de la galerie de manière dynamique **/
+// Fonction pour afficher les images de la galerie de manière dynamique
 function showGalleryImage(works) {
     const gallery = document.querySelector("#gallery");
     gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
@@ -16,7 +16,7 @@ function showGalleryImage(works) {
     }
 }
 
-// fonction anonyme de works
+// Fonction pour récupérer les œuvres depuis l'API et afficher la galerie
 async function getWorks(){
     const works = await fetch("http://localhost:5678/api/works") //récupération des éléménts(API et JSON)
     const result = await works.json()
@@ -24,12 +24,12 @@ async function getWorks(){
     showGalleryImage(result)
     showGalleryModalImage(result)
     showFilters(result)
-  // Si mon utilisateur n'est pas connecté
+
 }
 
-getWorks()
+getWorks() // Appel initial pour récupérer et afficher les œuvres
 
-/** Mettre les images de la galerie de manière dynamique dans la modal **/
+// Fonction pour afficher les images de la galerie modale
 function showGalleryModalImage(works) {
     const gallery = document.querySelector(".modal-gallery");
     gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie modale
@@ -61,7 +61,7 @@ function showGalleryModalImage(works) {
     }
 }
 
-// Montre les filtres
+// Fonction pour afficher les filtres par catégorie
 function showFilters(works){
     const filtersList = [...new Set(works.map(work => work.category.name))];
     const filtersContainer = document.getElementById("filters");
@@ -81,7 +81,7 @@ function showFilters(works){
         filtersContainer.appendChild(filterButton);
     });
 }
-// Affiche les filtres par catégorie
+// Fonction pour filtrer la galerie par catégorie
 function filterGalleryByCategory(category, works) {
     if(category === "all"){
         const filteredWorks = works;
@@ -95,6 +95,7 @@ function filterGalleryByCategory(category, works) {
         showGalleryImage(filteredWorks);
     }
 }
+
 // Sélectionne les éléments nécessaires
 const span = document.querySelectorAll("span");
 const openModalButton = document.querySelector(".modal-js");
@@ -104,6 +105,7 @@ const modal2 = document.querySelector(".modal2");
 const deleteGalleryParagraph = document.querySelector(".modal1 p");
 const addPhotoButton = document.querySelector(".js-modal2");
 const formPhoto = document.getElementById("form-photo");
+
 
 // Ouvre la première modal
 openModalButton.addEventListener("click", () => {
@@ -125,6 +127,7 @@ deleteGalleryParagraph.addEventListener("click", () => {
 });
 // Ouvre la deuxième modal (ajout de photo)
 addPhotoButton.addEventListener("click", () => {
+    const modal2 = document.querySelector(".modal2");
     modal2.style.display = "flex";
 }); 
 
@@ -141,6 +144,7 @@ formPhoto.addEventListener("submit", async (e) => {
     formData.append("image", image);
     formData.append("title", title);
     formData.append("category", category);
+    const buttonPhoto = document.querySelector(".js-modal2");
 
     try {
         const token = sessionStorage.getItem("token");
@@ -158,10 +162,6 @@ formPhoto.addEventListener("submit", async (e) => {
             modal2.style.display = "none";
             resetForm();
             getWorks();
-
-            // Modifier le texte du bouton pour indiquer que les photos ont été chargées
-            addPhotoButton.textContent = "Photos chargées";
-            addPhotoButton.classList.add("photos-loaded");
         } else {
             const errorData = await response.json();
             console.error("Erreur lors de l'ajout de la photo :", errorData.error);
@@ -170,8 +170,6 @@ formPhoto.addEventListener("submit", async (e) => {
         console.error("Une erreur s'est produite lors de l'ajout de la photo :", error);
     }
 });
-
-// suppression d'une œuvre à partir du serveur et de sa visualisation dans la galerie modale.
 
 async function deleteWork(id) {
     try {
@@ -193,3 +191,121 @@ async function deleteWork(id) {
         console.log(error);
     }
 }
+
+
+
+  // Choisir une image sur le clic bouton
+const importPhoto = document.querySelector("#importPhoto");
+importPhoto.addEventListener("change", previewFile);
+
+function previewFile() {
+    const file_extension_regex = /\.(jpg|png)$/i;
+    if (this.files.length == 0 || !file_extension_regex.test(this.files[0].name)) {
+    return;
+    }
+
+    const file = this.files[0];
+    const file_reader = new FileReader();
+    file_reader.readAsDataURL(file);
+    file_reader.addEventListener("load", (e) => displayImage(e, file));
+}
+
+function displayImage(event, file) {
+    const modalAjoutPhoto = document.querySelector(".modal-ajout-photo");
+    modalAjoutPhoto.innerHTML = "";
+    const photo = document.createElement("img");
+    photo.classList.add("photoChoose");
+    photo.src = event.target.result;
+    modalAjoutPhoto.appendChild(photo);
+}
+
+
+const addForm = async (formData) => {
+    try {
+            const response = await fetch("", {
+            method: "POST",
+            headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+    });    
+        if (response.status == 201) {alert ("Un nouveau projet a été ajouté")};
+    } catch (error) {
+        console.log(error);
+    }
+    // Fermer la seconde modal et actualiser la première (tout en gardant le fait de fermer la première fonctionnelle)
+    const modal1 = document.querySelector(".modal1");
+    const modal2 = document.querySelector(".modal2");
+    modal2.style.display = "none";
+    closeModal;
+    modal1.style.display = null;
+    // Actualiser l'affichage de la page en arrière plan
+    gallery.innerHTML="";
+    getWorks();
+};
+
+
+  // Formulaire ajout de travail
+
+const buttonPhoto = document.querySelector(".js-modal2");
+formPhoto.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const image = document.getElementById("importPhoto").files[0];
+    const titre = document.getElementById("titre").value;
+    const category = document.getElementById("category-select").value;
+
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("title", titre);
+    formData.append("category", category);
+
+    // Regarder si le formulaire est valide avant de l'envoyer
+    let myRegex = /^[a-zA-Z-\s]+$/;
+    if ((titre === "") || (category === "") || (image === undefined) || !myRegex.test(titre)) {
+        alert("Vous devez remplir tous les champs et le titre ne doit comporter que des lettres et des tirets");
+        return;
+        console.log()
+    } else {
+        
+        if (buttonPhoto.classList.contains("grey")) {
+            buttonPhoto.classList.remove("grey");
+            buttonPhoto.classList.add("green");
+            return;
+      // Si en cliquant, le bouton devient vert, c'est qu'il est bon à être envoyé, il suffit de recliquer dessus
+    } else {
+        const addForm = async (formData) => {
+            try {
+                    const response = await fetch("", {
+                    method: "POST",
+                    headers: {
+                    accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });    
+                if (response.status == 201) {alert ("Un nouveau projet a été ajouté")};
+            } catch (error) {
+                console.log(error);
+            }
+            // Fermer la seconde modal et actualiser la première (tout en gardant le fait de fermer la première fonctionnelle)
+            const modal1 = document.querySelector(".modal1");
+            const modal2 = document.querySelector(".modal2");
+            modal2.style.display = "none";
+            closeModal;
+            modal1.style.display = null;
+            // Actualiser l'affichage de la page en arrière plan
+            gallery.innerHTML="";
+            getWorks();
+        };
+        
+        
+    }
+}
+});
+
+
+
+
+
