@@ -511,6 +511,10 @@ article span {
 
 /** LOGIN **/
 
+.headerLogin{
+	margin: 50px;
+}
+
 .container {
 	max-width: 300px;
 	margin: 100px auto;
@@ -529,6 +533,8 @@ input[type="text"], input[type="password"] {
 	border-radius: 2px;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 	border: none;
+	height: 45px;
+	margin-bottom: 30px;
 }
 .submit {
 	display: flex;
