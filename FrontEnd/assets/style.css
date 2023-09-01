@@ -359,6 +359,7 @@ article span {
 }
 
 .green {
+	display: block;
 	width: 237px;
 	background-color: #1D6154;
 	border: none;

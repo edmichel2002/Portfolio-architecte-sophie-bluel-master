@@ -1,5 +1,5 @@
-const login = document.querySelector("#login");
-document.querySelector("#login").addEventListener("click", function (event) {
+const login = document.querySelector("#login-button");
+login.addEventListener("click", function (event) {
     event.preventDefault();
 
     // Récupérer les données du formulaire

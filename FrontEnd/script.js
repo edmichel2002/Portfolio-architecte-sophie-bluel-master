@@ -1,3 +1,24 @@
+const token = sessionStorage.getItem("token");
+if(token === null){
+    //Pas connecté
+    document.querySelector(".blackboard").style.display = "none";
+    document.querySelector(".modif").style.display = "none";
+    document.querySelector(".modal-js").style.display = "none";
+    document.querySelector("#logout").classList.add("invisible")
+    document.querySelector("#login").classList.remove("invisible")
+} else {
+    // Je suis connecté
+    document.querySelector("#login").classList.add("invisible")
+    document.querySelector("#logout").classList.remove("invisible")
+}
+
+const logout = document.querySelector("#logout")
+logout.addEventListener("click", () => {
+    sessionStorage.removeItem("token")
+    Window.reload()
+})
+
+
 // Fonction pour afficher les images de la galerie de manière dynamique
 function showGalleryImage(works) {
     const gallery = document.querySelector("#gallery");
@@ -20,7 +41,6 @@ function showGalleryImage(works) {
 async function getWorks(){
     const works = await fetch("http://localhost:5678/api/works") //récupération des éléménts(API et JSON)
     const result = await works.json()
-    console.log(result)
     showGalleryImage(result)
     showGalleryModalImage(result)
     showFilters(result)
@@ -65,6 +85,7 @@ function showGalleryModalImage(works) {
 function showFilters(works){
     const filtersList = [...new Set(works.map(work => work.category.name))];
     const filtersContainer = document.getElementById("filters");
+    filtersContainer.textContent = ""
     const allFilter = document.createElement("button");
     allFilter.textContent = "Tous"
     allFilter.addEventListener("click", () => filterGalleryByCategory("all", works));
@@ -131,6 +152,33 @@ addPhotoButton.addEventListener("click", () => {
     modal2.style.display = "flex";
 }); 
 
+function formValidation() {
+    const image = document.getElementById("importPhoto").files[0];
+    const title = document.getElementById("titre").value;
+    const category = document.getElementById("category-select").value;
+    const buttonPhoto = document.querySelector("#submit-photo");
+
+    let myRegex = /^[a-zA-Z-\s]+$/;
+    if ((titre === "") || (category === "") || (image === undefined) || myRegex.test(titre)) {
+        buttonPhoto.classList.remove("green");
+        buttonPhoto.classList.add("grey");
+        return false
+    } else {
+        buttonPhoto.classList.remove("grey")
+        buttonPhoto.classList.add("green")
+        return true
+    }
+}
+
+// On rajoute les evenement de test de validation d'un formulaire
+const inputPhoto= document.getElementById("importPhoto")
+inputPhoto.addEventListener("change", formValidation)
+
+const inputTitle = document.getElementById("titre")
+inputTitle.addEventListener("change", formValidation)
+
+const inputCategory = document.getElementById("category-select")
+inputCategory.addEventListener("change", formValidation)
 
 // Gérer l'envoi du formulaire d'ajout de photo
 formPhoto.addEventListener("submit", async (e) => {
@@ -146,28 +194,32 @@ formPhoto.addEventListener("submit", async (e) => {
     formData.append("category", category);
     const buttonPhoto = document.querySelector(".js-modal2");
 
-    try {
-        const token = sessionStorage.getItem("token");
+    if(formValidation()){
+        try {
+            const token = sessionStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5678/api/works", {
-            method: "POST",
-            body: formData,
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+            const response = await fetch("http://localhost:5678/api/works", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-        if (response.ok) {
-            alert("La photo a été ajoutée avec succès !");
-            modal2.style.display = "none";
-            resetForm();
-            getWorks();
-        } else {
-            const errorData = await response.json();
-            console.error("Erreur lors de l'ajout de la photo :", errorData.error);
+            if (response.ok) {
+                alert("La photo a été ajoutée avec succès !");
+                const workInsered = await response.json()
+                modal2.style.display = "none";
+                document.querySelector("#form-photo").reset();
+                getWorks();
+
+            } else {
+                const errorData = await response.json();
+                console.error("Erreur lors de l'ajout de la photo :", errorData.error);
+            }
+        } catch (error) {
+            console.error("Une erreur s'est produite lors de l'ajout de la photo :", error);
         }
-    } catch (error) {
-        console.error("Une erreur s'est produite lors de l'ajout de la photo :", error);
     }
 });
 
@@ -218,94 +270,3 @@ function displayImage(event, file) {
     photo.src = event.target.result;
     modalAjoutPhoto.appendChild(photo);
 }
-
-
-const addForm = async (formData) => {
-    try {
-            const response = await fetch("", {
-            method: "POST",
-            headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-    });    
-        if (response.status == 201) {alert ("Un nouveau projet a été ajouté")};
-    } catch (error) {
-        console.log(error);
-    }
-    // Fermer la seconde modal et actualiser la première (tout en gardant le fait de fermer la première fonctionnelle)
-    const modal1 = document.querySelector(".modal1");
-    const modal2 = document.querySelector(".modal2");
-    modal2.style.display = "none";
-    closeModal;
-    modal1.style.display = null;
-    // Actualiser l'affichage de la page en arrière plan
-    gallery.innerHTML="";
-    getWorks();
-};
-
-
-  // Formulaire ajout de travail
-
-const buttonPhoto = document.querySelector(".js-modal2");
-formPhoto.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const image = document.getElementById("importPhoto").files[0];
-    const titre = document.getElementById("titre").value;
-    const category = document.getElementById("category-select").value;
-
-    const formData = new FormData();
-    formData.append("image", image);
-    formData.append("title", titre);
-    formData.append("category", category);
-
-    // Regarder si le formulaire est valide avant de l'envoyer
-    let myRegex = /^[a-zA-Z-\s]+$/;
-    if ((titre === "") || (category === "") || (image === undefined) || !myRegex.test(titre)) {
-        alert("Vous devez remplir tous les champs et le titre ne doit comporter que des lettres et des tirets");
-        return;
-        console.log()
-    } else {
-        
-        if (buttonPhoto.classList.contains("grey")) {
-            buttonPhoto.classList.remove("grey");
-            buttonPhoto.classList.add("green");
-            return;
-      // Si en cliquant, le bouton devient vert, c'est qu'il est bon à être envoyé, il suffit de recliquer dessus
-    } else {
-        const addForm = async (formData) => {
-            try {
-                    const response = await fetch("", {
-                    method: "POST",
-                    headers: {
-                    accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            });    
-                if (response.status == 201) {alert ("Un nouveau projet a été ajouté")};
-            } catch (error) {
-                console.log(error);
-            }
-            // Fermer la seconde modal et actualiser la première (tout en gardant le fait de fermer la première fonctionnelle)
-            const modal1 = document.querySelector(".modal1");
-            const modal2 = document.querySelector(".modal2");
-            modal2.style.display = "none";
-            closeModal;
-            modal1.style.display = null;
-            // Actualiser l'affichage de la page en arrière plan
-            gallery.innerHTML="";
-            getWorks();
-        };
-        
-        
-    }
-}
-});
-
-
-
-
-
