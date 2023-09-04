@@ -1,42 +1,23 @@
-//Récupére le jeton de la session
 const token = sessionStorage.getItem("token");
-
-// Sélectionne les éléments HTML 
-const blackboardElement = document.querySelector(".blackboard");
-const modifElement = document.querySelector(".modif");
-const modalElement = document.querySelector(".modal-js");
-const logoutElement = document.querySelector("#logout");
-const loginElement = document.querySelector("#login");
-
-if (token === null) {
-    // L'utilisateur n'est pas connecté
-
-    // Cache les éléments
-    blackboardElement.style.display = "none";
-    modifElement.style.display = "none";
-    modalElement.style.display = "none";
-
-    // Gére la visibilité des boutons
-    logoutElement.classList.add("invisible");
-    loginElement.classList.remove("invisible");
+if(token === null){
+    //Pas connecté
+    document.querySelector(".blackboard").style.display = "none";
+    document.querySelector(".modif").style.display = "none";
+    document.querySelector(".modal-js").style.display = "none";
+    document.querySelector("#logout").classList.add("invisible")
+    document.querySelector("#login").classList.remove("invisible")
 } else {
-    // L'utilisateur est connecté
-    // Gére la visibilité des boutons
-    loginElement.classList.add("invisible");
-    logoutElement.classList.remove("invisible");
+    // Je suis connecté
+    document.querySelector("#login").classList.add("invisible")
+    document.querySelector("#logout").classList.remove("invisible")
 }
 
-// Ajoute un gestionnaire d'événements pour la déconnexion
-logoutElement.addEventListener("click", () => {
-    // Supprime le jeton de la session
-    sessionStorage.removeItem("token");
+const logout = document.querySelector("#logout")
+logout.addEventListener("click", () => {
+    sessionStorage.removeItem("token")
+    Window.reload()
+})
 
-    // Recharge la page pour appliquer les changements
-    window.location.reload();
-});
-
-
-// Fonction pour afficher les images de la galerie de manière dynamique
 function showGalleryImage(works) {
     const gallery = document.querySelector("#gallery");
     gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
@@ -56,7 +37,7 @@ function showGalleryImage(works) {
 
 // Fonction pour récupérer les œuvres depuis l'API et afficher la galerie
 async function getWorks(){
-    const works = await fetch("http://localhost:5678/api/works")
+    const works = await fetch("http://localhost:5678/api/works") //récupération des éléménts(API et JSON)
     const result = await works.json()
     showGalleryImage(result)
     showGalleryModalImage(result)
@@ -70,10 +51,11 @@ getWorks() // Appel initial pour récupérer et afficher les œuvres
 function showGalleryModalImage(works) {
     const gallery = document.querySelector(".modal-gallery");
     gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie modale
+    //document.querySelector('.filter').style.display = 'none';
 
     for (let work of works) {
         const figureElement = document.createElement("figure");
-        figureElement.style.position = "relative";
+        figureElement.style.position = "relative"; // Il faudra éventuellement utiliser une classe CSS
         const imageElement = document.createElement("img");
         const figcaptionElement = document.createElement("figcaption");
         figureElement.dataset.workId = work.id; // Stocker l'ID du travail dans le dataset
@@ -97,13 +79,9 @@ function showGalleryModalImage(works) {
     }
 }
 
-
-
-
-//Lorsque l'utilisateur clique sur un bouton de filtre, la fonction filterGalleryByCategory(category, works) est appelée pour afficher uniquement les projets de la catégorie sélectionnée.
 // Fonction pour afficher les filtres par catégorie
 function showFilters(works){
-    const filtersList = [...new Set(works.map(work => work.category.name))];//Les catégories uniques des projets sont extraites (categories) en utilisant un ensemble (Set) pour éviter les doublons.
+    const filtersList = [...new Set(works.map(work => work.category.name))];
     const filtersContainer = document.getElementById("filters");
     filtersContainer.textContent = ""
     const allFilter = document.createElement("button");
@@ -114,7 +92,7 @@ function showFilters(works){
     filtersContainer.appendChild(allFilter)
     
     filtersList.forEach(category => {
-        const filterButton = document.createElement("button"); //Ensuite, des boutons de filtre sont créés pour chaque catégorie en appelant createFilterButton(category, category, works, filtersContainer) et sont ajoutés au conteneur des filtres.
+        const filterButton = document.createElement("button");
         filterButton.textContent = category;
         //filterButton.classList.add("btnFilter")
         filterButton.className = "btnFilter"
@@ -123,7 +101,7 @@ function showFilters(works){
     });
 }
 // Fonction pour filtrer la galerie par catégorie
-function filterGalleryByCategory(category, works) {  //Lorsque l'utilisateur clique sur un bouton de filtre, cette fonction est appelée pour afficher uniquement les projets de la catégorie sélectionnée.
+function filterGalleryByCategory(category, works) {
     if(category === "all"){
         const filteredWorks = works;
         const gallery = document.getElementById("gallery");
@@ -153,12 +131,6 @@ openModalButton.addEventListener("click", () => {
     modal1.style.display = "flex";
 });
 
-// Ouvre la deuxième modal (ajout de photo)
-addPhotoButton.addEventListener("click", () => {
-    const modal2 = document.querySelector(".modal2");
-    modal2.style.display = "flex";
-}); 
-
 // Ferme toutes les modales
 closeModalButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -172,7 +144,11 @@ deleteGalleryParagraph.addEventListener("click", () => {
     const modalGallery = document.querySelector(".modal-gallery");
     modalGallery.innerHTML = ""; // Supprime le contenu de la galerie
 });
-
+// Ouvre la deuxième modal (ajout de photo)
+addPhotoButton.addEventListener("click", () => {
+    const modal2 = document.querySelector(".modal2");
+    modal2.style.display = "flex";
+}); 
 
 function formValidation() {
     const image = document.getElementById("importPhoto").files[0];
@@ -181,7 +157,7 @@ function formValidation() {
     const buttonPhoto = document.querySelector("#submit-photo");
 
     let myRegex = /^[a-zA-Z-\s]+$/;
-    if ((title === "") || (category === "") || (image === undefined) || myRegex.test(title)) {
+    if ((titre === "") || (category === "") || (image === undefined) || myRegex.test(titre)) {
         buttonPhoto.classList.remove("green");
         buttonPhoto.classList.add("grey");
         return false
@@ -192,7 +168,7 @@ function formValidation() {
     }
 }
 
-//On rajoute les évènements de test de validation d'un formulaire
+// On rajoute les evenement de test de validation d'un formulaire
 const inputPhoto= document.getElementById("importPhoto")
 inputPhoto.addEventListener("change", formValidation)
 
@@ -255,6 +231,7 @@ async function deleteWork(id) {
             }
         });
         if (resultFetch.ok) {
+            // Delete the figure from the gallery and delete the figure from the modal
             document.querySelectorAll(`figure[data-work-id="${id}"]`).forEach(figure => {
                 figure.parentNode.removeChild(figure);
             });
@@ -264,3 +241,31 @@ async function deleteWork(id) {
         console.log(error);
     }
 }
+
+
+
+  // Choisir une image sur le clic bouton
+const importPhoto = document.querySelector("#importPhoto");
+importPhoto.addEventListener("change", previewFile);
+
+function previewFile() {
+    const file_extension_regex = /\.(jpg|png)$/i;
+    if (this.files.length == 0 || !file_extension_regex.test(this.files[0].name)) {
+    return;
+    }
+
+    const file = this.files[0];
+    const file_reader = new FileReader();
+    file_reader.readAsDataURL(file);
+    file_reader.addEventListener("load", (e) => displayImage(e, file));
+}
+
+function displayImage(event, file) {
+    const modalAjoutPhoto = document.querySelector(".modal-ajout-photo");
+    modalAjoutPhoto.innerHTML = "";
+    const photo = document.createElement("img");
+    photo.classList.add("photoChoose");
+    photo.src = event.target.result;
+    modalAjoutPhoto.appendChild(photo);
+}
+
