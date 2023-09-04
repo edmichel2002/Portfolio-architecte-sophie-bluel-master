@@ -18,6 +18,8 @@ logout.addEventListener("click", () => {
     Window.reload()
 })
 
+
+// Fonction pour afficher les images de la galerie de manière dynamique
 function showGalleryImage(works) {
     const gallery = document.querySelector("#gallery");
     gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
@@ -268,4 +270,3 @@ function displayImage(event, file) {
     photo.src = event.target.result;
     modalAjoutPhoto.appendChild(photo);
 }
-
