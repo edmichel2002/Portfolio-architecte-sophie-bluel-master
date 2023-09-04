@@ -233,7 +233,7 @@ async function deleteWork(id) {
             }
         });
         if (resultFetch.ok) {
-            // Delete the figure from the gallery and delete the figure from the modal
+            // 
             document.querySelectorAll(`figure[data-work-id="${id}"]`).forEach(figure => {
                 figure.parentNode.removeChild(figure);
             });
