@@ -2,7 +2,7 @@ const login = document.querySelector("#login-button");
 login.addEventListener("click", function (event) {
     event.preventDefault();
 
-    // Récupérer les données du formulaire
+    // Récupére les données du formulaire
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
@@ -16,14 +16,14 @@ login.addEventListener("click", function (event) {
     })
     .then(response => response.json())
     .then(data => {
-        // Vérifier si le token a été correctement renvoyé par l'API
+        // Vérifie si le token a été correctement renvoyé par l'API
         if (data.token) {
-            // Stocker le token d'authentification localement dans la session de l'utilisateur à l'aide de l'API sessionStorage.
+            // Stocke le token d'authentification localement dans la session de l'utilisateur à l'aide de l'API sessionStorage.
             sessionStorage.setItem("token", data.token);
-            // Rediriger vers la page d'accueil ("./index.html").
+            // Redirige vers la page d'accueil ("./index.html").
             window.location.href = "./index.html";
         } else {
-            // Si le token n'est pas renvoyé ou est vide, afficher une alerte et rediriger vers la page de connexion.
+            // Si le token n'est pas renvoyé ou est vide, affiche une alerte et redirige vers la page de connexion.
             alert("Email or password incorrect");
             window.location.href = "./login.html";
         }
