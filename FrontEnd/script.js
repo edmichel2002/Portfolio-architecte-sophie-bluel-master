@@ -11,11 +11,13 @@ if(token === null){
     document.querySelector("#login").classList.add("invisible")
     document.querySelector("#logout").classList.remove("invisible")
 }
-
+// Ajoute un gestionnaire d'événements pour la déconnexion
 const logout = document.querySelector("#logout")
 logout.addEventListener("click", () => {
+    // Supprime le jeton de la session
     sessionStorage.removeItem("token")
-    Window.reload()
+    // Recharge la page pour appliquer les changements
+    window.reload()
 })
 
 
@@ -159,7 +161,7 @@ function formValidation() {
     const buttonPhoto = document.querySelector("#submit-photo");
 
     let myRegex = /^[a-zA-Z-\s]+$/;
-    if ((titre === "") || (category === "") || (image === undefined) || myRegex.test(titre)) {
+    if ((title === "") || (category === "") || (image === undefined) || myRegex.test(title)) {
         buttonPhoto.classList.remove("green");
         buttonPhoto.classList.add("grey");
         return false
@@ -270,3 +272,4 @@ function displayImage(event, file) {
     photo.src = event.target.result;
     modalAjoutPhoto.appendChild(photo);
 }
+
