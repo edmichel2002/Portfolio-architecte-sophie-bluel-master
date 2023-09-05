@@ -6,10 +6,12 @@ if(token === null){
     document.querySelector(".modal-js").style.display = "none";
     document.querySelector("#logout").classList.add("invisible")
     document.querySelector("#login").classList.remove("invisible")
+    document.querySelector("#filters").style.display = "flex";
 } else {
     // Je suis connecté
     document.querySelector("#login").classList.add("invisible")
     document.querySelector("#logout").classList.remove("invisible")
+    document.querySelector("#filters").style.display = "none";
 }
 // Ajoute un gestionnaire d'événements pour la déconnexion
 const logout = document.querySelector("#logout")
@@ -161,7 +163,7 @@ function formValidation() {
     const buttonPhoto = document.querySelector("#submit-photo");
 
     let myRegex = /^[a-zA-Z-\s]+$/;
-    if ((title === "") || (category === "") || (image === undefined) || myRegex.test(title)) {
+    if ((title === "") || (category === "") || (image === undefined) || !myRegex.test(title)) {
         buttonPhoto.classList.remove("green");
         buttonPhoto.classList.add("grey");
         return false
