@@ -1,6 +1,8 @@
+// Section 1: Gestion de la Connexion
 const token = sessionStorage.getItem("token");
 if(token === null){
     //Pas connecté
+    // Masquer certains éléments
     document.querySelector(".blackboard").style.display = "none";
     document.querySelector(".modif").style.display = "none";
     document.querySelector(".modal-js").style.display = "none";
@@ -9,6 +11,7 @@ if(token === null){
     document.querySelector("#filters").style.display = "flex";
 } else {
     // Je suis connecté
+    // Masquer/démasquer certains éléments
     document.querySelector("#login").classList.add("invisible")
     document.querySelector("#logout").classList.remove("invisible")
     document.querySelector("#filters").style.display = "none";
@@ -22,19 +25,24 @@ logout.addEventListener("click", () => {
     window.reload()
 })
 
-
+// Section 2: Affichage Dynamique de la Galerie
 // Fonction pour afficher les images de la galerie de manière dynamique
 function showGalleryImage(works) {
+    // Sélection de l'élément de la galerie
     const gallery = document.querySelector("#gallery");
-    gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie
+    gallery.innerHTML = ""; // Efface les éléments actuels de la galerie
 
+     // Boucle à travers les œuvres
     for (let work of works) {
+        // Création des éléments HTML pour chaque œuvre
         const figureElement = document.createElement("figure");
         const imageElement = document.createElement("img");
         const figcaptionElement = document.createElement("figcaption");
+        // Attribution des attributs src, alt et innerText
         imageElement.src = work.imageUrl;
         imageElement.alt = work.title;
         figcaptionElement.innerText = work.title;
+        // Ajout des éléments à la galerie
         figureElement.appendChild(imageElement);
         figureElement.appendChild(figcaptionElement);
         gallery.appendChild(figureElement);
@@ -44,8 +52,8 @@ function showGalleryImage(works) {
 // Fonction pour récupérer les œuvres depuis l'API et afficher la galerie
 async function getWorks(){
     const works = await fetch("http://localhost:5678/api/works") //récupération des éléménts(API et JSON)
-    const result = await works.json()
-    showGalleryImage(result)
+    const result = await works.json() // Conversion de la réponse en JSON
+    showGalleryImage(result) // Appel de la fonction showGalleryImage pour afficher les œuvres
     showGalleryModalImage(result)
     showFilters(result)
 
@@ -53,20 +61,20 @@ async function getWorks(){
 
 getWorks() // Appel initial pour récupérer et afficher les œuvres
 
-// Fonction pour afficher les images de la galerie modale
+// Section 3: Gestion de la Modale pour le Téléchargement de Médias
+// Affichage de la modale pour télécharger de nouvelles images
 function showGalleryModalImage(works) {
     const gallery = document.querySelector(".modal-gallery");
     gallery.innerHTML = ""; // Effacer les éléments actuels de la galerie modale
-    //document.querySelector('.filter').style.display = 'none';
 
     for (let work of works) {
         const figureElement = document.createElement("figure");
-        figureElement.style.position = "relative"; // Il faudra éventuellement utiliser une classe CSS
+        figureElement.style.position = "relative";
         const imageElement = document.createElement("img");
         const figcaptionElement = document.createElement("figcaption");
         figureElement.dataset.workId = work.id; // Stocker l'ID du travail dans le dataset
 
-        // Créer un élément icône de corbeille pour supprimer les images
+        // Gestionnaire d'événement pour la suppression d'une œuvre depuis la modale(Section 6)
         const trashIcon = document.createElement("i");
         trashIcon.classList.add("fa-solid", "fa-trash-can", "trash");
         trashIcon.addEventListener("click", async function (event) {
@@ -93,7 +101,6 @@ function showFilters(works){
     const allFilter = document.createElement("button");
     allFilter.textContent = "Tous"
     allFilter.addEventListener("click", () => filterGalleryByCategory("all", works));
-    //allFilter.classList.add("btnFilter")
     allFilter.className = "btnFilter"
     filtersContainer.appendChild(allFilter)
     
@@ -156,6 +163,8 @@ addPhotoButton.addEventListener("click", () => {
     modal2.style.display = "flex";
 }); 
 
+// Section 5: Gestion du Formulaire d'Ajout de Photo
+// Validation des données saisies dans le formulaire
 function formValidation() {
     const image = document.getElementById("importPhoto").files[0];
     const title = document.getElementById("titre").value;
@@ -174,7 +183,7 @@ function formValidation() {
     }
 }
 
-// On rajoute les evenement de test de validation d'un formulaire
+// // Événements de validation du formulaire
 const inputPhoto= document.getElementById("importPhoto")
 inputPhoto.addEventListener("change", formValidation)
 
@@ -184,7 +193,7 @@ inputTitle.addEventListener("change", formValidation)
 const inputCategory = document.getElementById("category-select")
 inputCategory.addEventListener("change", formValidation)
 
-// Gérer l'envoi du formulaire d'ajout de photo
+// // Gestion de l'envoi du formulaire d'ajout de photo
 formPhoto.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -227,6 +236,8 @@ formPhoto.addEventListener("submit", async (e) => {
     }
 });
 
+// Section 4: Suppression d'une Œuvre de la Galerie
+// Fonction pour supprimer une œuvre
 async function deleteWork(id) {
     try {
         const resultFetch = await fetch(`http://localhost:5678/api/works/${id}`, {
@@ -237,7 +248,7 @@ async function deleteWork(id) {
             }
         });
         if (resultFetch.ok) {
-            // 
+             // Suppression de l'œuvre de la galerie
             document.querySelectorAll(`figure[data-work-id="${id}"]`).forEach(figure => {
                 figure.parentNode.removeChild(figure);
             });
@@ -249,7 +260,7 @@ async function deleteWork(id) {
 }
 
 
-
+//gère la sélection et l'affichage d'une image lorsque l'utilisateur choisit un fichier en cliquant sur un bouton d'importation d'image.
   // Choisir une image sur le clic bouton
 const importPhoto = document.querySelector("#importPhoto");
 importPhoto.addEventListener("change", previewFile);
@@ -266,7 +277,7 @@ function previewFile() {
     file_reader.addEventListener("load", (e) => displayImage(e, file));
 }
 
-function displayImage(event, file) {
+function displayImage(event, file) {  //Cette fonction est appelée lorsque le chargement du fichier est terminé (lorsque l'événement "load" est déclenché par le FileReader)
     const modalAjoutPhoto = document.querySelector(".modal-ajout-photo");
     modalAjoutPhoto.innerHTML = "";
     const photo = document.createElement("img");
@@ -274,4 +285,7 @@ function displayImage(event, file) {
     photo.src = event.target.result;
     modalAjoutPhoto.appendChild(photo);
 }
+//ce code permet à l'utilisateur de sélectionner une image depuis son appareil, 
+//vérifie que l'extension du fichier est valide, puis affiche cette image dans un emplacement 
+//spécifique de la page web (dans un élément avec la classe "modal-ajout-photo").
 
