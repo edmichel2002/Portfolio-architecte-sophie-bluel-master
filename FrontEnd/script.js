@@ -62,6 +62,43 @@ async function getWorks(){
 getWorks() // Appel initial pour récupérer et afficher les œuvres
 
 // Section 3: Gestion de la Modale pour le Téléchargement de Médias
+// Sélectionne les éléments nécessaires
+const span = document.querySelectorAll("span");
+const openModalButton = document.querySelector(".modal-js");
+const closeModalButtons = document.querySelectorAll(".js-modal-close");
+const modal1 = document.querySelector(".modal1");
+const modal2 = document.querySelector(".modal2");
+const deleteGalleryParagraph = document.querySelector(".modal1 p");
+const addPhotoButton = document.querySelector(".js-modal2");
+const formPhoto = document.getElementById("form-photo");
+
+
+// Ouvre la première modal
+openModalButton.addEventListener("click", () => {
+    modal1.style.display = "flex";
+});
+
+// Ferme toutes les modales
+closeModalButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        modal1.style.display = "none";
+        modal2.style.display = "none";
+    });
+});
+
+// Supprime la galerie
+deleteGalleryParagraph.addEventListener("click", () => {
+    const modalGallery = document.querySelector(".modal-gallery");
+    modalGallery.innerHTML = ""; // Supprime le contenu de la galerie
+});
+// Ouvre la deuxième modal (ajout de photo)
+addPhotoButton.addEventListener("click", () => {
+    const modal2 = document.querySelector(".modal2");
+    modal2.style.display = "flex";
+}); 
+
+
+
 // Affichage de la modale pour télécharger de nouvelles images
 function showGalleryModalImage(works) {
     const gallery = document.querySelector(".modal-gallery");
@@ -128,40 +165,6 @@ function filterGalleryByCategory(category, works) {
     }
 }
 
-// Sélectionne les éléments nécessaires
-const span = document.querySelectorAll("span");
-const openModalButton = document.querySelector(".modal-js");
-const closeModalButtons = document.querySelectorAll(".js-modal-close");
-const modal1 = document.querySelector(".modal1");
-const modal2 = document.querySelector(".modal2");
-const deleteGalleryParagraph = document.querySelector(".modal1 p");
-const addPhotoButton = document.querySelector(".js-modal2");
-const formPhoto = document.getElementById("form-photo");
-
-
-// Ouvre la première modal
-openModalButton.addEventListener("click", () => {
-    modal1.style.display = "flex";
-});
-
-// Ferme toutes les modales
-closeModalButtons.forEach(button => {
-    button.addEventListener("click", () => {
-        modal1.style.display = "none";
-        modal2.style.display = "none";
-    });
-});
-
-// Supprime la galerie
-deleteGalleryParagraph.addEventListener("click", () => {
-    const modalGallery = document.querySelector(".modal-gallery");
-    modalGallery.innerHTML = ""; // Supprime le contenu de la galerie
-});
-// Ouvre la deuxième modal (ajout de photo)
-addPhotoButton.addEventListener("click", () => {
-    const modal2 = document.querySelector(".modal2");
-    modal2.style.display = "flex";
-}); 
 
 // Section 5: Gestion du Formulaire d'Ajout de Photo
 // Validation des données saisies dans le formulaire
@@ -247,17 +250,27 @@ async function deleteWork(id) {
                 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             }
         });
+
         if (resultFetch.ok) {
-             // Suppression de l'œuvre de la galerie
-            document.querySelectorAll(`figure[data-work-id="${id}"]`).forEach(figure => {
+            // Suppression réussie côté serveur
+            // Maintenant, supprimez l'élément du DOM côté client
+            const workElements = document.querySelectorAll(`figure[data-work-id="${id}"]`);
+            
+            workElements.forEach(figure => {
+                // Supprimez l'élément du DOM
                 figure.parentNode.removeChild(figure);
             });
+        } else {
+            alert("Une erreur est survenue lors de la suppression.");
         }
     } catch (error) {
         alert("Une erreur est survenue lors de la suppression.");
         console.log(error);
     }
+
 }
+
+
 
 
 //gère la sélection et l'affichage d'une image lorsque l'utilisateur choisit un fichier en cliquant sur un bouton d'importation d'image.
