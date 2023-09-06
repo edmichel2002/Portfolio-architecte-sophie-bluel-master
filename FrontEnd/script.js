@@ -183,7 +183,7 @@ function formValidation() {
     }
 }
 
-// // Événements de validation du formulaire
+//Événements de validation du formulaire
 const inputPhoto= document.getElementById("importPhoto")
 inputPhoto.addEventListener("change", formValidation)
 
@@ -193,7 +193,7 @@ inputTitle.addEventListener("change", formValidation)
 const inputCategory = document.getElementById("category-select")
 inputCategory.addEventListener("change", formValidation)
 
-// // Gestion de l'envoi du formulaire d'ajout de photo
+//Gestion de l'envoi du formulaire d'ajout de photo
 formPhoto.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -236,7 +236,7 @@ formPhoto.addEventListener("submit", async (e) => {
     }
 });
 
-// Section 4: Suppression d'une Œuvre de la Galerie
+// Section 6: Suppression d'une Œuvre de la Galerie
 // Fonction pour supprimer une œuvre
 async function deleteWork(id) {
     try {
